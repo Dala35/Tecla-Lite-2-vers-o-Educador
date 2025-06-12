@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tecla Lite Bilíngue</title>
+  <title>Tecla Lite Educador – Avatar</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -35,7 +35,7 @@
     }
     button {
       padding: 10px 20px;
-      margin: 10px 5px 0 0;
+      margin-top: 10px;
       border: none;
       border-radius: 8px;
       background-color: #4b9cd3;
@@ -48,29 +48,35 @@
       padding: 10px;
       border-radius: 8px;
     }
+    #avatar {
+      text-align: center;
+      margin-top: 10px;
+    }
+    #avatar img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>🧠 Tecla Lite Bilíngue</h1>
-    <p>Comunicação assistida para crianças autistas – Português e Inglês</p>
+    <h1>🧠 Tecla Lite – Educador com Avatar</h1>
+    <p>Assistente de comunicação com expressões animadas</p>
   </header>
 
   <div class="container">
-    <label for="idioma">🌐 Escolha o idioma:</label>
-    <select id="idioma">
-      <option value="pt">Português</option>
-      <option value="en">English</option>
-    </select>
-
-    <label for="entrada">📝 Digite o que a criança deseja comunicar:</label>
-    <input type="text" id="entrada" placeholder="Ex: Quero brincar lá fora" />
-
+    <label for="entrada">📝 O que a criança deseja comunicar?</label>
+    <input type="text" id="entrada" placeholder="Ex: Estou feliz hoje!" />
     <button onclick="responder()">Falar</button>
     <button onclick="exportarHistorico()">Exportar Histórico</button>
 
+    <div id="avatar">
+      <img id="imgAvatar" src="https://i.imgur.com/U7l8JjO.png" alt="Avatar feliz" />
+    </div>
+
     <div id="saida"></div>
-    <div id="historico"><strong>🗂️ Frases registradas:</strong><br><ul id="lista"></ul></div>
+    <div id="historico"><strong>🗂️ Frases registradas:</strong><ul id="lista"></ul></div>
   </div>
 
   <script>
@@ -78,39 +84,46 @@
 
     function responder() {
       const entrada = document.getElementById("entrada").value.trim();
-      const idioma = document.getElementById("idioma").value;
+      const saida = document.getElementById("saida");
+      const avatar = document.getElementById("imgAvatar");
 
       if (!entrada) return;
 
-      let resposta;
-      if (idioma === "pt") {
-        resposta = "Tecla disse: '" + entrada + "'. Vamos entender com carinho. 💬";
+      let resposta = "Tecla disse: '" + entrada + "'. Vamos entender com carinho. 💬";
+
+      // Avatar emocional
+      const palavrasPositivas = ["feliz", "brincar", "gosto", "consegui"];
+      const palavrasNegativas = ["triste", "dor", "cansado", "medo"];
+
+      let expressao = "neutro";
+      for (let p of palavrasPositivas) {
+        if (entrada.toLowerCase().includes(p)) expressao = "feliz";
+      }
+      for (let n of palavrasNegativas) {
+        if (entrada.toLowerCase().includes(n)) expressao = "triste";
+      }
+
+      if (expressao === "feliz") {
+        avatar.src = "https://i.imgur.com/U7l8JjO.png"; // avatar feliz
+      } else if (expressao === "triste") {
+        avatar.src = "https://i.imgur.com/cdt0oFq.png"; // avatar triste
       } else {
-        resposta = "Tecla said: '" + entrada + "'. Let's understand with care. 💬";
+        avatar.src = "https://i.imgur.com/zBja0a2.png"; // avatar neutro
       }
-
-      // Avatar expressivo com emoji simples
-      if (entrada.toLowerCase().includes("triste") || entrada.toLowerCase().includes("dor")) {
-        resposta += " 😢";
-      }
-      if (entrada.toLowerCase().includes("feliz") || entrada.toLowerCase().includes("brincar")) {
-        resposta += " 😊";
-      }
-
-      document.getElementById("saida").innerText = resposta;
 
       // Fala
       const utter = new SpeechSynthesisUtterance(resposta);
-      utter.lang = idioma === "pt" ? 'pt-PT' : 'en-US';
+      utter.lang = 'pt-PT';
       window.speechSynthesis.speak(utter);
 
-      // Histórico
+      saida.innerText = resposta;
+
+      // Adicionar ao histórico
       historico.push(`${new Date().toLocaleString()} - ${resposta}`);
       const li = document.createElement("li");
       li.textContent = resposta;
       document.getElementById("lista").appendChild(li);
 
-      // Limpar campo
       document.getElementById("entrada").value = "";
     }
 
