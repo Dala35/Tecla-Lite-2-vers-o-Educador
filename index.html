@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tecla Lite Bilíngue</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef7fb;
+      color: #333;
+      padding: 20px;
+    }
+    header {
+      background-color: #4b9cd3;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      border-radius: 10px;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px 5px 0 0;
+      border: none;
+      border-radius: 8px;
+      background-color: #4b9cd3;
+      color: white;
+      cursor: pointer;
+    }
+    #saida, #historico {
+      background: #e6f7ff;
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🧠 Tecla Lite Bilíngue</h1>
+    <p>Comunicação assistida para crianças autistas – Português e Inglês</p>
+  </header>
+
+  <div class="container">
+    <label for="idioma">🌐 Escolha o idioma:</label>
+    <select id="idioma">
+      <option value="pt">Português</option>
+      <option value="en">English</option>
+    </select>
+
+    <label for="entrada">📝 Digite o que a criança deseja comunicar:</label>
+    <input type="text" id="entrada" placeholder="Ex: Quero brincar lá fora" />
+
+    <button onclick="responder()">Falar</button>
+    <button onclick="exportarHistorico()">Exportar Histórico</button>
+
+    <div id="saida"></div>
+    <div id="historico"><strong>🗂️ Frases registradas:</strong><br><ul id="lista"></ul></div>
+  </div>
+
+  <script>
+    const historico = [];
+
+    function responder() {
+      const entrada = document.getElementById("entrada").value.trim();
+      const idioma = document.getElementById("idioma").value;
+
+      if (!entrada) return;
+
+      let resposta;
+      if (idioma === "pt") {
+        resposta = "Tecla disse: '" + entrada + "'. Vamos entender com carinho. 💬";
+      } else {
+        resposta = "Tecla said: '" + entrada + "'. Let's understand with care. 💬";
+      }
+
+      // Avatar expressivo com emoji simples
+      if (entrada.toLowerCase().includes("triste") || entrada.toLowerCase().includes("dor")) {
+        resposta += " 😢";
+      }
+      if (entrada.toLowerCase().includes("feliz") || entrada.toLowerCase().includes("brincar")) {
+        resposta += " 😊";
+      }
+
+      document.getElementById("saida").innerText = resposta;
+
+      // Fala
+      const utter = new SpeechSynthesisUtterance(resposta);
+      utter.lang = idioma === "pt" ? 'pt-PT' : 'en-US';
+      window.speechSynthesis.speak(utter);
+
+      // Histórico
+      historico.push(`${new Date().toLocaleString()} - ${resposta}`);
+      const li = document.createElement("li");
+      li.textContent = resposta;
+      document.getElementById("lista").appendChild(li);
+
+      // Limpar campo
+      document.getElementById("entrada").value = "";
+    }
+
+    function exportarHistorico() {
+      let conteudo = "Histórico de Frases – Tecla Lite\n\n";
+      conteudo += historico.join("\n");
+
+      const blob = new Blob([conteudo], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "historico_tecla_lite.txt";
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
